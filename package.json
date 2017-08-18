@@ -1,0 +1,17 @@
+{
+  "name": "jnj-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app/device.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "azure-iot-device": "^1.1.17",
+    "azure-iot-device-mqtt": "^1.1.17",
+    "azure-iothub": "^1.1.14",
+    "node-uuid": "^1.4.8"
+  }
+}

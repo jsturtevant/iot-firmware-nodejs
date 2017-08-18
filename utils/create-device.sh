@@ -1,0 +1,1 @@
+iothub-explorer create $1 --connection-string
