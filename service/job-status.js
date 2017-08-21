@@ -2,22 +2,12 @@ var uuid = require('uuid');
 var JobClient = require('azure-iothub').JobClient;
 var Registry = require('azure-iothub').Registry;
 
-var connectionString = '';
-
 const connString = process.argv[2] || process.env.connectionString;
 var jobStatus = process.argv[3] || "scheduled"
 
 var jobClient = JobClient.fromConnectionString(connString);
 
-//var jobId = process.argv[2];
-// jobClient.getJob(jobId, function (err, result) {
-//     if (err) {
-//         console.error('Could not get job status: ' + err.message);
-//     } else {
-//         console.log('Job: ' + jobId + ' - status: ' + result.status);
-//         console.log(JSON.stringify(result, null, 2));
-//     }
-// });
+
 
 const query = jobClient.createQuery("scheduleDeviceMethod",jobStatus);
 

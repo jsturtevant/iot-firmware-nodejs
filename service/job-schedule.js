@@ -1,13 +1,13 @@
 var uuid = require('uuid');
 var JobClient = require('azure-iothub').JobClient;
 
-var deviceToUpdate = process.argv[2];
-const connString = process.argv[3] || process.env.connectionString;
+const connString = process.argv[2] || process.env.connectionString;
+var region = process.argv[3] || "US";
 
 var jobClient = JobClient.fromConnectionString(connString);
 
-var queryCondition = `deviceId IN ['${deviceToUpdate}']`;
-var startTime = addMinutes(new Date(), 5);
+var queryCondition = `tags.location.region = '${region}'`;
+var startTime = addMinutes(new Date(), 1);
 var maxExecutionTimeInSeconds = 60;
 
 var methodParams = {
