@@ -22,10 +22,17 @@ module.exports = class FirmwareUpdater {
         console.log("firmware upgrade started")
 
         async.waterfall([
-            async.apply(this.downloadImage.bind(this), fwPackageUri),
+            async.apply(this.resetFirmware.bind(this), fwPackageUri),
+            this.downloadImage.bind(this),
             this.applyImage.bind(this)
         ], function (err) {
             callback(err);
+        });
+    }
+
+    resetFirmware(fwPackageUri, callback) {
+        this.reportFWUpdateThroughTwin(null, function(){
+            callback(null, fwPackageUri)
         });
     }
 
@@ -43,9 +50,9 @@ module.exports = class FirmwareUpdater {
                     status: 'downloading',
                     startedDownloadingTime: new Date().toISOString()
                 },
-                callback);
+                    callback);
             },
-             callback => {
+            callback => {
                 console.log("Downloading image from URI: " + fwPackageUriVal);
 
                 // Replace this line with the code to download the image.  Delay used to simulate the download.
@@ -53,7 +60,7 @@ module.exports = class FirmwareUpdater {
                     callback(null);
                 }, 4000);
             },
-             callback => {
+            callback => {
                 console.log("downloaded");
 
                 self.reportFWUpdateThroughTwin({
@@ -63,7 +70,7 @@ module.exports = class FirmwareUpdater {
                     callback);
             },
         ],
-             err => {
+            err => {
                 if (err) {
                     self.reportFWUpdateThroughTwin({ status: 'Download image failed' }, function (err) {
                         callback(err);
@@ -80,7 +87,7 @@ module.exports = class FirmwareUpdater {
         const self = this;
 
         async.waterfall([
-             callback => {
+            callback => {
                 console.log("starting apply image...");
 
                 self.reportFWUpdateThroughTwin({
@@ -89,7 +96,7 @@ module.exports = class FirmwareUpdater {
                 },
                     callback);
             },
-             callback =>  {
+            callback => {
                 console.log("Applying firmware image");
 
                 // Replace this line with the code to apply image
@@ -98,15 +105,15 @@ module.exports = class FirmwareUpdater {
                     console.log("Applied.");
                 }, 4000);
             },
-             callback => {
+            callback => {
                 self.reportFWUpdateThroughTwin({
                     status: 'apply firmware image complete',
                     lastFirmwareUpdate: new Date().toISOString()
                 },
-                callback);
+                    callback);
             },
         ],
-             err =>  {
+            err => {
                 if (err) {
                     thiselfs.reportFWUpdateThroughTwin({ status: 'Apply image failed' }, function (err) {
                         callback(err);
