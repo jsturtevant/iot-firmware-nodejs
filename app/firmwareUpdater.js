@@ -107,7 +107,7 @@ module.exports = class FirmwareUpdater {
             },
             callback => {
                 self.reportFWUpdateThroughTwin({
-                    status: 'apply firmware image complete',
+                    status: 'apply complete',
                     lastFirmwareUpdate: new Date().toISOString()
                 },
                     callback);
