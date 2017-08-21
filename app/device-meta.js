@@ -12,6 +12,7 @@ exports.deviceMetaData = (deviceId, params) => {
         'SerialNumber': 'SER9090',
         'FirmwareVersion': '1.10',
         'Platform': 'node.js',
+        'region': 'US',
         'Processor': 'ARM',
         'InstalledRAM': '64 MB',
         'Latitude': 47.617025,
