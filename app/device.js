@@ -8,6 +8,7 @@ const message = require('./messageHandler');
 const telemetry = require('./telemetry');
 const twin = require('./twin');
 const methods = require('./direct-methods');
+const FirmwareUpdater = require('./firmwareUpdater')
 
 const connString = process.argv[2] || process.env.connectionString;
 const isTelemetryEnabled = process.argv[3] || '' === 'nt' ? false : true;
@@ -26,7 +27,9 @@ const connect = function (err) {
 
         client.on('message', message.messageHandler(client));
         client.onDeviceMethod('turnOn', methods.turnOn);
-        client.onDeviceMethod('firmwareUpdate', methods.initiateUpdate);
+
+        const firmwareUpdater = new FirmwareUpdater(client);
+        client.onDeviceMethod('firmwareUpdate', methods.initiateUpdate(firmwareUpdater));
 
         // start event data send routing
         if (isTelemetryEnabled) {

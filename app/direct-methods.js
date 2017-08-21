@@ -1,21 +1,22 @@
 const firmwareUpdater = require('./firmwareUpdater')
 
-module.exports = {
-    turnOn: function (request, response) {
-        printDeviceMethodRequest(request);
+exports.turnOn = function (request, response) {
+    printDeviceMethodRequest(request);
 
-        // Implement here
-        console.log(`turning on: ${request.payload}`)
+    // Implement here
+    console.log(`turning on: ${request.payload}`)
 
-        // complete the response
-        response.send(200, 'turned On', printResponseSent);
-    },
-    initiateUpdate: function (request, response) {
+    // complete the response
+    response.send(200, 'turned On', printResponseSent);
+};
+
+exports.initiateUpdate = function (firmwareUpdater) {
+    return function (request, response) {
         printDeviceMethodRequest(request);
 
         const packageUrl = request.payload.fwPackageUri;
 
-        if (!firmwareUpdater.isConnectionValid(packageUrl)){
+        if (!firmwareUpdater.isConnectionValid(packageUrl)) {
             response.send(400, 'Invalid connection.  Must use https:// protocol.', printResponseSent);
             return;
         }
@@ -23,7 +24,11 @@ module.exports = {
         response.send(200, 'Firmware update started.', printResponseSent);
 
         firmwareUpdater.initiateFirmwareUpdateFlow(packageUrl, function (err) {
-            if (!err) console.log("Completed firmwareUpdate flow");
+            if (err) {
+                console.log("firmware update failed");
+            } else {
+                console.log("Completed firmwareUpdate flow");
+            }
         });
     }
 }

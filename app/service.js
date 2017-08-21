@@ -1,16 +1,14 @@
 var Registry = require('azure-iothub').Registry;
 var Client = require('azure-iothub').Client;
 
-const connString = process.argv[2] || process.env.connectionString;
+const methodName = process.argv[2] || "turnOn"
+const connString = process.argv[3] || process.env.connectionString;
 var registry = Registry.fromConnectionString(connString);
 var client = Client.fromConnectionString(connString);
 
 var params = {
     fwPackageUri: 'https://secureurl'
 };
-
-var methodName = "turnOn";
-
 
 var methodParams = {
     methodName: methodName,
