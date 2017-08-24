@@ -10,7 +10,7 @@
             "name": "Launch current",
             "program": "${file}",
             "args": [
-                  "<your connection string>"
+                  "HostName=workshophub.azure-devices.net;DeviceId=ds1;SharedAccessKey=TUP87fI1hlvcxNfksVZfWTH9HpDdONOo4EaDRxxvfwQ="
             ]
         },
         {
@@ -19,7 +19,7 @@
             "name": "device",
             "program": "${workspaceRoot}\\app\\device.js",
             "args": [
-                "<your connection string>",
+                "HostName=workshophub.azure-devices.net;DeviceId=ds1;SharedAccessKey=TUP87fI1hlvcxNfksVZfWTH9HpDdONOo4EaDRxxvfwQ=",
                 "nt"
             ]
         }

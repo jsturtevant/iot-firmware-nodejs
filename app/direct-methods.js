@@ -21,14 +21,19 @@ exports.initiateUpdate = function (firmwareUpdater) {
             return;
         }
 
-        response.send(200, 'Firmware update started.', printResponseSent);
-
-        firmwareUpdater.initiateFirmwareUpdateFlow(packageUrl, function (err) {
+        response.send(200, 'Firmware update started.', (err) => {
             if (err) {
-                console.log("firmware update failed");
-            } else {
-                console.log("Completed firmwareUpdate flow");
+                console.error('An error ocurred when sending a method response:\n' + err.toString());
+                return;
             }
+
+            firmwareUpdater.initiateFirmwareUpdateFlow(packageUrl, function (err) {
+                if (err) {
+                    console.log("firmware update failed");
+                } else {
+                    console.log("Completed firmwareUpdate flow");
+                }
+            });
         });
     }
 }
@@ -38,15 +43,14 @@ function printDeviceMethodRequest(request) {
     console.log('Received method call for method \'' + request.methodName + '\'');
 
     // if there's a payload just do a default console log on it
-    if (!!(request.payload)) {
+    if (request.payload) {
         console.log('Payload:\n' + request.payload);
     }
 }
 
 function printResponseSent(err) {
-    if (!!err) {
-        console.error('An error ocurred when sending a method response:\n' +
-            err.toString());
+    if (err) {
+        console.error('An error ocurred when sending a method response:\n' + err.toString());
     } else {
         console.log('Response to method sent successfully.');
     }

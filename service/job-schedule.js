@@ -7,7 +7,7 @@ var region = process.argv[3] || "US";
 var jobClient = JobClient.fromConnectionString(connString);
 
 var queryCondition = `tags.location.region = '${region}'`;
-var startTime = addMinutes(new Date(), 1);
+var startTime = addMinutes(new Date(), 0);
 var maxExecutionTimeInSeconds = 60;
 
 var methodParams = {
