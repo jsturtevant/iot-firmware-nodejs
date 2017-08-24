@@ -23,13 +23,14 @@ module.exports = class FirmwareUpdater {
         console.log("firmware upgrade started")
 
         this.resetFirmwareReport()
-            .then(_ => this.startDownloadingReport())
+            .then(_ => this.sendDownloadingReport())
             .then(_ => this.download(fwPackageUri))
             .then(fileLocation => this.sendDownloadedReport())
             .then(_ => this.sendApplyingReport())
             .then(_ => this.applyImage())
             .then(_ => this.sendAppliedReport())
             .then(_ => {
+                
                 callback();
             })
             .catch(err => {
@@ -87,11 +88,12 @@ module.exports = class FirmwareUpdater {
     }
 
     applyImage(fileLocation) {
-        // Replace this line with the code to apply image
-        setTimeout(function () {
-            callback(null);
-            console.log("Applied.");
-        }, 4000);
+        return new Promise(function (fulfill, reject) {
+            setTimeout(function () {
+                console.log("Applied.");
+                fulfill();
+            }, 4000);
+        });
     }
 
     reportFWUpdateThroughTwin(firmwareUpdateValue) {
@@ -144,7 +146,7 @@ module.exports = class FirmwareUpdater {
 
             var req = https.get(options, res => {
                 res.on('data', d => {
-                    const fileName = process.env.HOME + 'newfile.js';
+                    const fileName = 'C:\\temp\\updates\\newfiles.zip';
                     fs.writeFile(fileName, d, function (err) {
                         if (err) {
                             console.log("writefile: " + err);
