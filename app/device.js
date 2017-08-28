@@ -28,7 +28,19 @@ const connect = function (err) {
         client.on('message', message.messageHandler(client));
         client.onDeviceMethod('turnOn', methods.turnOn);
 
-        const firmwareUpdater = new FirmwareUpdater(client);
+        const options = {
+            downloadOpts: {
+                fingerPrintSet: [
+                    '49:DC:39:67:1C:5B:8C:C3:08:0F:77:5A:07:C2:BE:A5:B4:D9:DA:1A'
+                ],
+                location: 'C:\\temp\\updates\\',
+                //fileName:'app.zip', 
+                decompress: { 
+                    location: 'C:\\temp\\updates\\unzipped\\'
+                }
+            }
+        }
+        const firmwareUpdater = new FirmwareUpdater(client, options);
         client.onDeviceMethod('firmwareUpdate', methods.initiateUpdate(firmwareUpdater));
 
         // start event data send routing
@@ -39,10 +51,12 @@ const connect = function (err) {
 
         // handle disconnect and errors.
         client.on('error', function (err) {
+            console.log('client error');
             helpers.printErrorFor('client')(err);
         });
 
         client.on('disconnect', function () {
+            console.log('disconnected');
             clearInterval(sendInterval);
             client.removeAllListeners();
             client.open(connect);

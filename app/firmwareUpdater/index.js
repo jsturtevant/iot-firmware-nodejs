@@ -1,11 +1,10 @@
 const url = require('url');
-const async = require('async');
-const https = require('https');
-const fs = require('fs');
+const downloader = require('./downloader');
 
 module.exports = class FirmwareUpdater {
-    constructor(client) {
+    constructor(client, options) {
         this.client = client;
+        this.options = options;
     }
 
     isConnectionValid(fwPackageUri = "") {
@@ -24,13 +23,13 @@ module.exports = class FirmwareUpdater {
 
         this.resetFirmwareReport()
             .then(_ => this.sendDownloadingReport())
-            .then(_ => this.download(fwPackageUri))
+            .then(_ => downloader.download(fwPackageUri, this.options.downloadOpts))
             .then(fileLocation => this.sendDownloadedReport())
             .then(_ => this.sendApplyingReport())
             .then(_ => this.applyImage())
             .then(_ => this.sendAppliedReport())
             .then(_ => {
-                
+                // complete
                 callback();
             })
             .catch(err => {
@@ -121,73 +120,6 @@ module.exports = class FirmwareUpdater {
         });
     }
 
-    // using pattern as described here http://hassansin.github.io/certificate-pinning-in-nodejs
-    download(uriToFile) {
-
-        // Embed valid fingerprints in the code
-        const FINGERPRINTSET = [
-            '49:DC:39:67:1C:5B:8C:C3:08:0F:77:5A:07:C2:BE:A5:B4:D9:DA:1A'
-        ];
-
-        const parsedUri = url.parse(uriToFile);
-
-        var options = {
-            hostname: parsedUri.hostname,
-            port: 443,
-            path: parsedUri.path,
-            method: 'GET',
-            //disable session caching
-            agent: new https.Agent({
-                maxCachedSessions: 0
-            })
-        };
-
-        return new Promise(function (fulfill, reject) {
-
-            var req = https.get(options, res => {
-                res.on('data', d => {
-                    const fileName = 'C:\\temp\\updates\\newfiles.zip';
-                    fs.writeFile(fileName, d, function (err) {
-                        if (err) {
-                            console.log("writefile: " + err);
-                            return reject(err);
-                        }
-
-                        console.log("The file was saved!");
-                        fulfill(fileName);
-                    });
-                });
-            }).on('error', e => {
-                console.error(e);
-                reject(e);
-            });
-
-            req.on('socket', socket => {
-                socket.on('secureConnect', () => {
-                    var fingerprint = socket.getPeerCertificate().fingerprint;
-
-                    // Check if certificate is valid
-                    if (socket.authorized === false) {
-                        req.emit('error', new Error(socket.authorizationError));
-                        req.abort();
-                        return reject(e);
-                    }
-
-                    // Match the fingerprint with our saved fingerprints
-                    if (FINGERPRINTSET.indexOf(fingerprint) === -1) {
-                        const err = new Error('Fingerprint does not match');
-                        // Abort request, optionally emit an error event
-                        req.emit('error', err);
-                        req.abort();
-                        return reject(err);
-                    }
-                });
-            });
-
-            req.end();
-        });
-
-    }
 }
 
 
