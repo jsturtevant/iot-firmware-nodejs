@@ -34,10 +34,17 @@ const connect = function (err) {
                     '49:DC:39:67:1C:5B:8C:C3:08:0F:77:5A:07:C2:BE:A5:B4:D9:DA:1A'
                 ],
                 location: 'C:\\temp\\updates\\',
-                //fileName:'app.zip', 
-                decompress: { 
+                decompress: {
                     location: 'C:\\temp\\updates\\unzipped\\'
                 }
+            },
+            applyImage: function (imageName) {
+                return new Promise(function (fulfill, reject) {
+                    setTimeout(function () {
+                        console.log(`Applied. ${imageName}`);
+                        fulfill();
+                    }, 4000);
+                });
             }
         }
         const firmwareUpdater = new FirmwareUpdater(client, options);

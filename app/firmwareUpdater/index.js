@@ -87,12 +87,13 @@ module.exports = class FirmwareUpdater {
     }
 
     applyImage(fileLocation) {
-        return new Promise(function (fulfill, reject) {
-            setTimeout(function () {
-                console.log("Applied.");
-                fulfill();
-            }, 4000);
-        });
+        const self = this;
+
+        if (!self.options.applyImage || typeof self.options.applyImage !== 'function') {
+            return Promise.reject('must be function');
+        }
+        
+        return self.options.applyImage(fileLocation);
     }
 
     reportFWUpdateThroughTwin(firmwareUpdateValue) {
