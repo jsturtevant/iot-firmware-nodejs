@@ -45,6 +45,9 @@ const connect = function (err) {
                         fulfill();
                     }, 4000);
                 });
+            },
+            restart: function(){
+                process.exit();
             }
         }
         const firmwareUpdater = new FirmwareUpdater(client, options);

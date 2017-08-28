@@ -22,12 +22,9 @@ module.exports = class FirmwareUpdater {
         console.log("firmware upgrade started")
 
         this.resetFirmwareReport()
-            .then(_ => this.sendDownloadingReport())
-            .then(_ => downloader.download(fwPackageUri, this.options.downloadOpts))
-            .then(fileLocation => this.sendDownloadedReport())
-            .then(_ => this.sendApplyingReport())
-            .then(_ => this.applyImage())
-            .then(_ => this.sendAppliedReport())
+            .then(_ => this.download(fwPackageUri))
+            .then(fileLocation => this.apply(fileLocation))
+            .then(_ => this.restart())
             .then(_ => {
                 // complete
                 callback();
@@ -45,9 +42,34 @@ module.exports = class FirmwareUpdater {
             });
     }
 
+    restart(){
+        if (!this.options.restart){
+            console.log('restart skipped');
+            return Promise.resolve();
+        }
+        
+        if (typeof this.options.restart !== 'function') {
+            return Promise.reject('must be function');
+        }
+
+        console.log("restarting...");
+        const self = this;
+        this.sendRestartReport().then(_ => self.options.restart());
+    }
+
     resetFirmwareReport() {
         // setting to null clears in reported property.
         return this.reportFWUpdateThroughTwin(null);
+    }
+
+    download(fwPackageUri) {
+        return this.sendDownloadingReport()
+            .then(_ => downloader.download(fwPackageUri, this.options.downloadOpts))
+            .then(fileLocation => {
+                this.sendDownloadedReport().then(_ => {
+                    return Promise.resolve(fileLocation);
+                });
+            });
     }
 
     sendDownloadingReport() {
@@ -64,11 +86,25 @@ module.exports = class FirmwareUpdater {
         })
     }
 
+    apply(fileLocation) {
+        return this.sendApplyingReport()
+            .then(_ => this.applyImage(fileLocation))
+            .then(_ => this.sendAppliedReport())
+    }
+
     sendApplyingReport() {
         return this.reportFWUpdateThroughTwin({
             status: 'applying',
             startedApplyingImage: new Date().toISOString()
-        })
+        });
+    }
+
+    applyImage(fileLocation) {
+        if (!this.options.applyImage || typeof this.options.applyImage !== 'function') {
+            return Promise.reject('must be function');
+        }
+
+        return this.options.applyImage(fileLocation);
     }
 
     sendAppliedReport() {
@@ -78,22 +114,20 @@ module.exports = class FirmwareUpdater {
         });
     }
 
+    sendRestartReport() {
+        return this.reportFWUpdateThroughTwin({
+            status: 'restarting',
+            startedRestart: new Date().toISOString()
+        });
+    }
+ 
+
     sendErrorReport(err) {
         return this.reportFWUpdateThroughTwin({
             status: 'error',
             errorMessage: err,
             errorTime: new Date().toISOString()
         });
-    }
-
-    applyImage(fileLocation) {
-        const self = this;
-
-        if (!self.options.applyImage || typeof self.options.applyImage !== 'function') {
-            return Promise.reject('must be function');
-        }
-        
-        return self.options.applyImage(fileLocation);
     }
 
     reportFWUpdateThroughTwin(firmwareUpdateValue) {
