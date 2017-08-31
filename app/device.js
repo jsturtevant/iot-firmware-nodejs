@@ -8,7 +8,7 @@ const message = require('./messageHandler');
 const telemetry = require('./telemetry');
 const twin = require('./twin');
 const methods = require('./direct-methods');
-const FirmwareUpdater = require('./firmwareUpdater')
+const FirmwareUpdater = require('az-firmware-updater')
 
 const connString = process.argv[2] || process.env.connectionString;
 const isTelemetryEnabled = process.argv[3] || '' === 'nt' ? false : true;
@@ -28,7 +28,7 @@ const connect = function (err) {
         client.on('message', message.messageHandler(client));
         client.onDeviceMethod('turnOn', methods.turnOn);
 
-        const options = {
+        const options = { 
             downloadOpts: {
                 fingerPrintSet: [
                     '49:DC:39:67:1C:5B:8C:C3:08:0F:77:5A:07:C2:BE:A5:B4:D9:DA:1A'

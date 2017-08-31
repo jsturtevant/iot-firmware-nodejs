@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "az-firmware-updater": "0.0.6",
     "azure-iot-device": "^1.1.17",
     "azure-iot-device-mqtt": "^1.1.17",
     "azure-iothub": "^1.1.14",

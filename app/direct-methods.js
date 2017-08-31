@@ -1,4 +1,4 @@
-const firmwareUpdater = require('./firmwareUpdater')
+const firmwareUpdater = require('az-firmware-updater')
 
 exports.turnOn = function (request, response) {
     printDeviceMethodRequest(request);
@@ -14,7 +14,7 @@ exports.initiateUpdate = function (firmwareUpdater) {
     return function (request, response) {
         printDeviceMethodRequest(request);
 
-        const packageUrl = request.payload.fwPackageUri;
+        const packageUrl = request.payload.firmwareUrl;
 
         if (!firmwareUpdater.isConnectionValid(packageUrl)) {
             response.send(400, 'Invalid connection.  Must use https:// protocol.', printResponseSent);
